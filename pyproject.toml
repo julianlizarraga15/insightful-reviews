@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "insightful-reviews"
+version = "0.1.0"
+description = "Identify key aspects mentioned in product reviews."
+authors = ["julianlizarraga15 <julian.lizarraga.15@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+numpy = "^1.26.4"
+pandas = "^2.2.1"
+openai = "^1.13.3"
+requests = "^2.31.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
