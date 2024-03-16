@@ -1,5 +1,6 @@
 import requests
 import pandas as pd
+import os
 from urllib.parse import urlencode, quote, unquote
 import time
 
@@ -31,6 +32,8 @@ def make_request_with_backoff(url, params, max_attempts=5):
     raise Exception(f"Failed to fetch data after {max_attempts} attempts.")
 
 def fetch_all_reviews(base_url, initial_params):
+    print("Fetching all reviews from site...")
+    start_time = time.time()
     all_reviews = []
     params = initial_params.copy()
     while True:
@@ -46,23 +49,31 @@ def fetch_all_reviews(base_url, initial_params):
             params = dict(param.split('=') for param in next_params_str.split('&'))
         else:
             break  # No more pages
+    end_time = time.time()
+    print(f"Total reviews fetched: {len(all_reviews)}")
+    print(f"Time taken to fetch reviews: {(end_time - start_time)/60:.2f} minutes")
 
     return all_reviews
 
-def process_reviews_to_csv(base_url, initial_params, csv_file_name):
+def process_reviews_to_csv(base_url, initial_params, csv_path):
 
     review_data = fetch_all_reviews(base_url, initial_params)
     reviews_df = pd.json_normalize(review_data)
-    reviews_df.to_csv(csv_file_name, index=False)
-    print(f"Total reviews fetched: {len(reviews_df)}")
+    reviews_df.to_csv(csv_path, index=False)
 
-# Configuration
-base_url = 'https://api.okendo.io/v1/stores/231fb74a-b56e-4485-8920-1e583252adf5/reviews'
-initial_params = {
-    'limit': 5,
-    'orderBy': 'has_media desc'
-}
-csv_file_name = 'reviews_workfromhomedesk.csv'
 
-# Execution
-process_reviews_to_csv(base_url, initial_params, csv_file_name)
+if __name__ == '__main__':
+    
+    # Configuration
+    base_url = 'https://api.okendo.io/v1/stores/231fb74a-b56e-4485-8920-1e583252adf5/reviews'
+    initial_params = {
+        'limit': 5,
+        'orderBy': 'has_media desc'
+    }
+    current_dir = os.path.dirname(__file__)
+    relative_path = '../data/raw'
+    csv_name = 'reviews_workfromhomedesk.csv'
+    csv_path = os.path.join(current_dir, relative_path, csv_name)
+
+    # Execution
+    process_reviews_to_csv(base_url, initial_params, csv_path)
